@@ -18,7 +18,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
       {/* AI 头像（左侧） */}
       {role === "assistant" && (
         <Avatar className="h-8 w-8">
-          <AvatarImage src="/ai-avatar.png" alt="AI" />
+          {/* <AvatarImage src="/ai-avatar.png" alt="AI" /> */}
           <AvatarFallback>🤖</AvatarFallback>
         </Avatar>
       )}
@@ -38,6 +38,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
       {/* 用户头像（右侧） */}
       {role === "user" && (
         <Avatar className="h-8 w-8">
+          {/* <AvatarImage src="/user-avatar.png" alt="User" /> */}
           <AvatarFallback>👤</AvatarFallback>
         </Avatar>
       )}

@@ -20,20 +20,25 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  nav
 }: Readonly<{
   children: React.ReactNode;
+  nav: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
+     
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          {nav}
           {children}
         </ThemeProvider>
       </body>
