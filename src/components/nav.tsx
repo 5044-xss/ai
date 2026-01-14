@@ -25,6 +25,16 @@ export default function Nav() {
   // 检查当前路径是否匹配
   const isActive = (path: string) => pathname === path;
   
+  // 定义导航项数组
+  const demoItems = [
+    { path: '/day1', label: 'Day1' },
+    { path: '/day2', label: 'Day2' },
+    { path: '/day3', label: 'Day3' },
+  ];
+  
+  // 检查是否是demo页面
+  const isDemoActive = demoItems.some(item => isActive(item.path));
+  
   return (
     <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[10vh] flex items-center">
       <div className="w-full max-w-screen-xl mx-auto px-4">
@@ -46,7 +56,7 @@ export default function Nav() {
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`font-medium transition-colors duration-200 flex items-center py-2 px-3 rounded-md ${
-                ['/day1', '/day2'].some(path => isActive(path))
+                isDemoActive
                   ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30' 
                   : 'text-gray-700 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700/50'
               }`}
@@ -69,26 +79,21 @@ export default function Nav() {
               <div 
                 className="absolute mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-md py-2 z-20 min-w-[140px] left-1/2 transform -translate-x-1/2 border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700"
               >
-                <a 
-                  href="/day1" 
-                  className={`block px-4 py-2 transition-colors duration-150 first:rounded-t-md last:rounded-b-md ${
-                    isActive('/day1')
-                      ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  Day1
-                </a>
-                <a 
-                  href="/day2" 
-                  className={`block px-4 py-2 transition-colors duration-150 first:rounded-t-md last:rounded-b-md ${
-                    isActive('/day2')
-                      ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  Day2
-                </a>
+                {demoItems.map((item, index) => (
+                  <a 
+                    key={item.path}
+                    href={item.path}
+                    className={`block px-4 py-2 transition-colors duration-150 ${
+                      index === 0 ? 'first:rounded-t-md' : ''
+                    } ${index === demoItems.length - 1 ? 'last:rounded-b-md' : ''} ${
+                      isActive(item.path)
+                        ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                ))}
               </div>
             )}
           </div>
