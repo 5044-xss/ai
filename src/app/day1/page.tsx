@@ -29,7 +29,7 @@ export default function Day1Page() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/chat/day1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
@@ -67,7 +67,7 @@ export default function Day1Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-4">
+    <div className="bg-gradient-to-b from-gray-50 to-white p-4">
       <div className="max-w-3xl mx-auto">
         <header className="text-center py-6">
           <h1 className="text-3xl font-bold text-gray-800">🧠 智能体问答 day1</h1>
