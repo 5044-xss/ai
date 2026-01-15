@@ -1,5 +1,5 @@
 
-import {  NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import {
   RunnableSequence,
 } from '@langchain/core/runnables';
@@ -8,17 +8,18 @@ import {
   MessagesPlaceholder
 } from '@langchain/core/prompts';
 
+import type {Message} from '@/types/globals'
+
 export const runtime = 'nodejs';
 // 自定义调用模型层
-export const customModelCall = async (input: { messages: BaseMessage[] }) => {
+export const customModelCall = async (input: { messages: Message[] }) => {
   /* ---------------------------------- 请求模型 ---------------------------------- */
   const body = JSON.stringify({
-    // model: 'qwen-max',
-    model: 'qwen-turbo',
+    model: 'qwen-max',
+    // model: 'qwen-turbo',
     input,
     parameters: {
-      result_format: 'message',
-      stream: true, // 启用流式响应
+      result_format: 'message', stream: true, // 启用流式响应
     },
   })
 
@@ -62,10 +63,9 @@ export const customModelCall = async (input: { messages: BaseMessage[] }) => {
           }
           // 解码接收到的数据块
           const chunk = decoder.decode(value, { stream: true });
-        
+
           // 按行处理
           const lines = chunk.split('\n');
-
           console.log(lines, 'chunk 千问返回数据-------------');
 
           for (const line of lines) {
@@ -90,8 +90,8 @@ export const customModelCall = async (input: { messages: BaseMessage[] }) => {
                     const sseData = `data: ${JSON.stringify({ content: choice.delta.content })}\n\n`;
                     controller.enqueue(encoder.encode(sseData));
                   }
-                  // 如果是完整消息且不是停止标志，则也需要处理
-                  else if (choice.message?.content && choice.finish_reason !== 'stop') {
+                  // 如果是完整消息，则发送内容（包括结束消息）
+                  else if (choice.message?.content) {
                     const sseData = `data: ${JSON.stringify({ content: choice.message.content })}\n\n`;
                     controller.enqueue(encoder.encode(sseData));
                   }
@@ -131,7 +131,7 @@ export const formatMessages = (input: { messages: Array<{ role: string; content:
 }
 
 // 新增一个步骤：注入系统提示
-const injectSystemPrompt = (input: { messages: BaseMessage[] }) => {
+const injectSystemPrompt = (input: { messages: Message[] }) => {
   const systemPrompt = "你是一个专业的客服助手，请用中文礼貌回答，并且每次回复我的时候先回复一个微笑";
 
   // 如果第一条不是 system，则前置插入
@@ -150,7 +150,7 @@ const injectSystemPrompt = (input: { messages: BaseMessage[] }) => {
 // 创建一个 LangChain 链，使用通用接口
 export const createChain = (systemPrompt?: string) => {
   // 动态提示词
-  const inject = (input: { messages: BaseMessage[] }) => {
+  const inject = (input: { messages: Message[] }) => {
     if (!systemPrompt) return input;
     if (input.messages[0]?.role === 'system') return input;
     return {

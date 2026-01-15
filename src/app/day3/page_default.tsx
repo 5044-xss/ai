@@ -10,99 +10,62 @@ import { SendIcon, RotateCcwIcon, SunIcon, MoonIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { processStream } from '@/lib/sse-handler';
 
-/**
- * 消息类型定义
- * @property {string} role - 消息角色 ('user' | 'assistant')
- * @property {string} content - 消息内容
- * @property {string} [id] - 消息唯一ID
- */
 type Message = {
   role: 'user' | 'assistant';
   content: string;
   id?: string;
 };
 
-/**
- * 智能问答助手页面组件
- * 
- * 功能特点：
- * - 支持用户与AI助手的对话交互
- * - 实现流式响应显示，模拟打字机效果
- * - 提供主题切换功能（明暗模式）
- * - 集成错误处理和加载状态管理
- */
 export default function SmartAgentPage() {
-  // 状态管理
-  const [input, setInput] = useState('');                                    // 用户输入
-  const [messages, setMessages] = useState<Message[]>([]);                   // 消息列表
-  const [isLoading, setIsLoading] = useState(false);                         // 加载状态
-  const [error, setError] = useState<string | null>(null);                   // 错误信息
-  const [streamingText, setStreamingText] = useState('');                    // 流式响应文本
-  const [isStreaming, setIsStreaming] = useState(false);                     // 流式响应状态
-
-  // 引用管理
-  const streamingTextRef = useRef(streamingText);                            // 当前流式文本引用
-  const messagesEndRef = useRef<HTMLDivElement>(null);                       // 消息列表底部引用
-
-  // 主题管理
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
+  const [streamingText, setStreamingText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const streamingTextRef = useRef(streamingText);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * 同步 streamingTextRef 的值
-   * 确保在回调函数中能访问到最新的 streamingText 值
-   */
+  // 同步 streamingTextRef 的值
   useEffect(() => {
     streamingTextRef.current = streamingText;
   }, [streamingText]);
 
-  /**
-   * 滚动到消息列表底部
-   * 在消息更新或流式响应变化时自动滚动
-   */
+  // 滚动到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingText]);
 
-  /**
-   * 处理表单提交事件
-   * 发送用户输入到AI助手并处理响应
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!input.trim() || isLoading) return;  // 添加 isLoading 检查防止重复提交
 
-    // 输入验证和防重复提交
-    if (!input.trim() || isLoading) return;
-
-    // 重置错误状态并添加用户消息
     setError(null);
     const userMessage: Message = { role: 'user', content: input, id: Date.now().toString() };
     setMessages((prev) => [...prev, userMessage]);
-
-    // 重置输入框并设置加载状态
     setInput('');
     setIsLoading(true);
     setIsStreaming(true);
     setStreamingText('');
 
     try {
-      // 准备请求数据
       const body = JSON.stringify({ messages: [...messages, userMessage] });
-      console.log(body, '请求数据', messages);
-
-      // 发起API请求
+      console.log(body, 'body-req', messages);
+      
+      // 使用流式API
       const response = await fetch('/api/chat/day3', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
       });
 
-      // 检查响应状态
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || '请求失败');
       }
 
-      // 使用SSE处理函数处理流式响应
+      // 使用SSE处理函数
       await processStream(
         response,
         // onChunk - 每次接收到数据块时更新流式文本
@@ -114,13 +77,8 @@ export default function SmartAgentPage() {
           // 仅当 streamingText 有内容时才添加到消息列表
           setMessages(prev => [
             ...prev,
-            {
-              role: 'assistant',
-              content: streamingTextRef.current,
-              id: Date.now().toString()
-            }
+            { role: 'assistant', content: streamingTextRef.current, id: Date.now().toString() }
           ]);
-
           // 重置状态
           setIsStreaming(false);
           setIsLoading(false);
@@ -136,7 +94,7 @@ export default function SmartAgentPage() {
         }
       );
     } catch (err: any) {
-      console.error('请求错误:', err);
+      console.error(err);
       setError(err.message || '网络错误');
       setIsStreaming(false);
       setIsLoading(false);
@@ -144,10 +102,6 @@ export default function SmartAgentPage() {
     }
   };
 
-  /**
-   * 清空对话历史
-   * 重置所有状态和输入框
-   */
   const handleClear = () => {
     setMessages([]);
     setInput('');
@@ -156,9 +110,6 @@ export default function SmartAgentPage() {
     setIsStreaming(false);
   };
 
-  /**
-   * 切换主题（明暗模式）
-   */
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };

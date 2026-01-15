@@ -30,6 +30,7 @@ export default function Nav() {
     { path: '/day1', label: 'Day1' },
     { path: '/day2', label: 'Day2' },
     { path: '/day3', label: 'Day3' },
+    { path: '/day4', label: 'Day4' },
   ];
   
   // 检查是否是demo页面

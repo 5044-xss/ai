@@ -1,13 +1,14 @@
 // components/chat-message.tsx
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import type { Message } from '@/types/globals'
 
-type ChatMessageProps = {
-  role: "user" | "assistant";
-  content: string;
-};
 
-export function ChatMessage({ role, content }: ChatMessageProps) {
+interface ExtendedMessage extends Message {
+  extraContent?: React.ReactNode;
+}
+
+export function ChatMessage({ role, content, extraContent }: ExtendedMessage) {
   return (
     <div
       className={cn(
@@ -33,6 +34,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
         )}
       >
         {content}
+        {extraContent && <div className="mt-2">{extraContent}</div>}
       </div>
 
       {/* 用户头像（右侧） */}
