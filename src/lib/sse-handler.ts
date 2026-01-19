@@ -22,9 +22,6 @@ export async function processStream(
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split(/\r?\n/); // 兼容 \r\n 和 \n
       buffer = lines.pop() || '';
-
-      
-
       for (const line of lines) {
         // ✅ 更健壮：允许 data: 后有任意空白（包括无空格）
         const dataMatch = line.match(/^data:\s*(.*)$/);
@@ -42,6 +39,9 @@ export async function processStream(
           const delta = parsed?.content; // 只认 .content
           if (typeof delta === 'string') {
             onChunk(delta);
+          } else if (Array.isArray(delta)) {
+            const result = delta?.[0]?.text
+            result ? onChunk(result) : null
           }
         } catch (e) {
           console.error('Error parsing SSE data:', e, 'raw line:', line);
@@ -66,7 +66,10 @@ export async function processStream(
           const parsed = JSON.parse(dataStr);
           const delta = parsed?.content;
           if (typeof delta === 'string') {
-          onChunk(delta);
+            onChunk(delta);
+          } else if (Array.isArray(delta)) {
+            const result = delta?.[0]?.text
+            result ? onChunk(result) : null
           }
         } catch (e) {
           console.error('Error parsing remaining SSE data:', e, 'line:', line);

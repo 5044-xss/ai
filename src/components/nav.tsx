@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { ThemeToggle } from '@/components/theme-toggle'; // 你自己的主题切换按钮
 
 export default function Nav() {
   const pathname = usePathname();
@@ -32,6 +33,7 @@ export default function Nav() {
     { path: '/day3', label: 'Day3' },
     { path: '/day4', label: 'Day4' },
     { path: '/day5', label: 'Day5' },
+    { path: '/day6', label: 'Day6' },
   ];
   
   // 检查是否是demo页面
@@ -111,7 +113,9 @@ export default function Nav() {
           >
             其他
           </a>
+          <ThemeToggle /> 
         </div>
+      
       </div>
     </nav>
   );
