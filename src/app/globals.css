@@ -123,3 +123,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.doc-chunk:target {
+  background-color: #fff9c4!important;
+  padding: 8px;
+  border-left: 3px solid #f59e0b;
+}

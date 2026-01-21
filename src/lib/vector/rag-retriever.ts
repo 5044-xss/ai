@@ -20,15 +20,15 @@ export async function retrieveRelevantChunks(question: string, topK = 3) {
     score: cosineSimilarity(queryEmbedding, chunk.embedding)
   }));
 
-  // 3. 按分数排序，取 Top-K
-  return scoredChunks
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK)
-    .map(({ text, score }) => ({ text, score }));
-  
+  // // 3. 按分数排序，取 Top-K
   // return scoredChunks
-  //   .filter(chunk => chunk.score > MIN_SCORE) // ← 关键！
   //   .sort((a, b) => b.score - a.score)
   //   .slice(0, topK)
   //   .map(({ text, score }) => ({ text, score }));
+  
+  return scoredChunks
+    .filter(chunk => chunk.score > MIN_SCORE) // ← 关键！
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map(({ text, score }) => ({ text, score }));
 }

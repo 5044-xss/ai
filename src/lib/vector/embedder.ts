@@ -27,6 +27,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     );
   }
 
+  console.log(text,'-----------------');
+  
+
   // 推理：mean pooling + L2 归一化（符合 BGE 训练方式）
   const output = await embedder(text, {
     pooling: 'mean',
